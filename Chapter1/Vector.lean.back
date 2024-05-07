@@ -1,0 +1,180 @@
+import Mathlib.Algebra.Field.Basic
+import Mathlib.GroupTheory.GroupAction.Pi
+
+namespace LADR
+
+@[ext]
+class AddCommGroup (V : Type _) extends Add V, Zero V, Neg V where
+  add_comm : ∀ u v : V, u + v = v + u
+  add_assoc : ∀ u v w : V, u + v + w = u + (v + w)
+  add_zero : ∀ v : V, v + 0 = v
+  add_right_inv : ∀ v : V, v + -v = 0
+
+@[ext]
+class VectorSpace (F : Type _) (V : Type _) [Field F] [AddCommGroup V] extends SMul F V where
+  mul_smul : ∀ a b : F, ∀ v : V, (a * b) • v = a • b • v
+  one_smul : ∀ v : V, (1 : F) • v = v
+  smul_add : ∀ a : F, ∀ u v : V, a • (u + v) = a • u + a • v
+  add_smul : ∀ a b : F, ∀ v : V, (a + b) • v = a • v + b • v
+
+variable {F : Type _} [field_f: Field F] {n : ℕ}
+
+instance nTupleAddCommGroup : AddCommGroup (Fin n → F) where
+  add u v := u + v
+  zero := 0
+  neg v := -v
+  add_comm := add_comm
+  add_assoc := add_assoc
+  add_zero := add_zero
+  add_right_inv := add_neg_self
+
+instance nTupleVectorSpace : VectorSpace F (Fin n → F) where
+  smul a v := a • v
+  mul_smul := mul_smul
+  one_smul := one_smul F
+  smul_add := by
+    intro a u v
+    funext
+    simp
+    apply field_f.left_distrib
+  add_smul := by
+    intro a b v
+    funext
+    simp
+    apply field_f.right_distrib
+
+-- 1.22  Example  F^∞
+-- We defined an n-tuple as a map from `fin n` to F, so a natural definition of
+-- an infinite tuple is just a map from ℕ to F.
+instance infTupleAddCommGroup : AddCommGroup (ℕ → F) where
+  add u v := u + v
+  zero := 0
+  neg v := -v
+  add_comm := add_comm
+  add_assoc := add_assoc
+  add_zero := add_zero
+  add_right_inv := add_neg_self
+
+def infTupleVectorSpace : VectorSpace F (ℕ → F)
+    where
+  smul a v := a • v
+  mul_smul := mul_smul
+  one_smul := one_smul F
+  smul_add := by
+    intro a u v
+    funext
+    simp
+    apply field_f.left_distrib
+  add_smul := by
+    intro a b v
+    funext
+    simp
+    apply field_f.right_distrib
+
+-- 1.23  Notation  F^S
+-- In Lean, we generally use types where most mathematicians use sets.  Also in
+-- Lean, the type of functions from S to F is 'S → F'.
+-- 1.24  Example  F^S is a vector space
+variable (S : Type _)
+
+instance funAddCommGroup : AddCommGroup (S → F) where
+  add u v := u + v
+  zero := 0
+  neg v := -v
+  add_comm := add_comm
+  add_assoc := add_assoc
+  add_zero := add_zero
+  add_right_inv := add_neg_self
+
+instance funVectorSpace : VectorSpace F (S → F) where
+  smul a v x := a * v x
+  mul_smul := mul_smul
+  one_smul := one_smul F
+  smul_add := by
+    intro a u v
+    funext
+    apply field_f.left_distrib
+  add_smul := by
+    intro a b v
+    funext
+    apply field_f.right_distrib
+
+-- 1.25  Unique additive identity
+-- "A vector space has a unique additive identity"
+theorem unique_add_ident {V : Type _} [AddCommGroup V] {z : V} (h : ∀ v : V, v + z = v) : z = 0 :=
+  calc
+    z = z + 0 := by rw [AddCommGroup.add_zero]
+    _ = 0 + z := by rw [AddCommGroup.add_comm]
+    _ = 0 := by rw [h]
+
+-- 1.26  Unique additive inverse
+theorem zero_add {V : Type _} [AddCommGroup V] {v : V} : 0 + v = v :=
+  by
+  rw [AddCommGroup.add_comm]
+  apply AddCommGroup.add_zero
+
+theorem unique_add_inv {V : Type _} [AddCommGroup V] {v w : V} (h : v + w = 0) : w = -v :=
+  calc
+    w = w + 0 := by rw [AddCommGroup.add_zero]
+    _ = w + (v + -v) := by rw [← AddCommGroup.add_right_inv]
+    _ = w + v + -v := by rw [AddCommGroup.add_assoc]
+    _ = v + w + -v := by rw [AddCommGroup.add_comm w v]
+    _ = 0 + -v := by rw [h]
+    _ = -v := by rw [zero_add]
+
+-- 1.27  Notation  -v, w - v
+-- We started with -v, before proving it was unique.
+-- Notation for 'w - v'
+instance {V : Type _} [AddCommGroup V] : Sub V :=
+  ⟨fun w v => w + -v⟩
+
+@[simp]
+theorem sub_add_neg {V : Type _} [AddCommGroup V] (u v : V) : u - v = u + -v :=
+  rfl
+
+theorem neg_neg' {v : V} [AddCommGroup V] : - -v = v := by
+  have : v + -v = 0 := AddCommGroup.add_right_inv v
+  rw [AddCommGroup.add_comm v (-v)] at this
+  exact Eq.symm (unique_add_inv this)
+
+-- 1.28  Notation  V
+variable {V : Type _} [AddCommGroup V] [VectorSpace F V]
+
+-- 1.29  The number 0 times a vector
+-- Lean proofs are very explicit, so we tend to use lots of helper lemmas for
+-- things that most mathematicians wouldn't even mention in their proofs.
+theorem sub_self {v : V} : v - v = 0 := by simp; apply AddCommGroup.add_right_inv
+
+theorem add_sub_cancel {u v : V} : u + v - v = u :=
+  by
+  simp
+  rw [AddCommGroup.add_assoc, AddCommGroup.add_right_inv, AddCommGroup.add_zero]
+
+theorem zero_vec_eq_zero {v : V} : (0 : F) • v = 0 :=
+  by
+  apply Eq.symm
+  calc
+    0 = (0 : F) • v - (0 : F) • v := by rw [sub_self]
+    _ = ((0 : F) + (0 : F)) • v - (0 : F) • v := by simp
+    _ = (0 : F) • v + (0 : F) • v - (0 : F) • v := by sorry
+    _ = (0 : F) • v := by apply add_sub_cancel
+
+-- 1.30  A number times the vector 0
+theorem field_zero_eq_zero {a : F} : a • (0 : V) = 0 :=
+  calc
+    a • (0 : V) = a • (0 : V) + a • (0 : V) - a • (0 : V) := by rw [add_sub_cancel]
+    _ = a • (0 + 0 : V) - a • (0 : V) := by sorry
+    _ = a • (0 : V) - a • (0 : V) := by rw [AddCommGroup.add_zero]
+    _ = 0 := by rw [sub_self]
+
+-- 1.31  The number -1 times a vector
+theorem neg_one_smul_is_neg {v : V} : (-1 : F) • v = -v :=
+  by
+  rw [← unique_add_inv]
+  calc
+    v + (-1 : F) • v = (1 : F) • v + (-1 : F) • v := by sorry
+    _ = ((1 : F) + (-1 : F)) • v := by sorry
+    _ = (0 : F) • v := by simp
+    _ = 0 := zero_vec_eq_zero
+
+end LADR
