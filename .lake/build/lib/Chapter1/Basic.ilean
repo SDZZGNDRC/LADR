@@ -1,1 +1,1 @@
-{"version":2,"references":{"c:hello":{"usages":[],"definition":[0,4,0,9]}},"module":"Chapter1.Basic"}
+{"version":2,"references":{"c:Tuple":{"usages":[[10,24,10,29]],"definition":null},"c:Real":{"usages":[[4,16,4,17]],"definition":null},"c:Nat":{"usages":[[10,14,10,15]],"definition":null},"c:Field":{"usages":[[8,23,8,28]],"definition":null}},"module":"Chapter1.Basic"}

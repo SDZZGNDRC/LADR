@@ -1,9 +1,16 @@
 import Mathlib.Tactic
 import Mathlib.Analysis.Calculus.FDeriv.Add
--- set_option pp.all true
+import Mathlib.Order.Filter.Basic
+import Mathlib.Topology.Defs.Filter
+import Aesop
+import Chapter1.S1C_Subspaces
+open Filter Topology
+
+
 variable {F : Type*} (a b : ℝ) [Field F]
 -- variable {V : Type _} [AddCommGroup V] [Module F V]
 -- [Module F (Fin 3 → F)]
+
 
 example {m : Set (Fin 3 → F)}
         (h : ∀ x, x 0 + 2 * x 1 + 3 * x 2 = 0 ↔ x ∈ m)
@@ -213,7 +220,9 @@ example {B : ℝ} {m : Set (R03 → ℝ)}
 
 
 -- example 1.35 (e)
-example {m : Set (ℕ → ℂ)} : True := by trivial
+example {m : Set (ℕ → ℂ)} (h : ∀ s, s ∈ m ↔ Tendsto s atTop (𝓝 0))
+        : ∃ n : Submodule ℝ (ℕ → ℂ), m = n := by
+  sorry
 
 
 -- exercise 3
@@ -254,8 +263,8 @@ example {m : Set (Rn44 → ℝ)}
 
 -- exercise 4
 
--- exercise 5: ℝ² is a subspace of ℂ² over ℝ
-          --ℝ² isn't a subspace of ℂ² over ℂ
+-- exercise 5: ℝ² is a subspace of ℂ² over ℝ  → yes
+          --ℝ² isn't a subspace of ℂ² over ℂ  → no
 example {m : Set (Fin 2 → ℂ)}
         (h : ∀ x, x ∈ m ↔ (x 0).im = 0 ∧ (x 1).im = 0)
         : ∃ n : Submodule ℝ (Fin 2 → ℂ), m = n := by
@@ -284,3 +293,34 @@ example {m : Set (Fin 2 → ℂ)}
       exact And.intro (Or.inr ((h x).mp xm).1) (Or.inr ((h x).mp xm).2)
   }
   use n; rfl
+
+-- exercise 6.a: answer: yes, why: skip
+-- exercise 6.b: skip
+
+-- exercise 7: Choose an arbitrary non-zero element `a` of R², then construct {a, -a, 0}.
+
+-- exercise 8: {(x, 0), (0, y)}
+
+-- exercise 9: skip
+
+-- exercise 10: suppose U₁ and U₂ are subspaces of V. Prove that the intersection
+--              U₁ ∩ U₂ is a subspace of V.
+
+-- NOTE: Mathlib\Algebra\Module\Submodule\Lattice.lean defines the lattice structure on submodules,
+-- `Submodule.CompleteLattice`, with `⊥` defined as `{0}`
+-- and `⊓` defined as intersection of the underlying carrier.
+-- If `p` and `q` are submodules of a module, `p ≤ q` means that `p ⊆ q`.
+
+-- Using mathlib, this is trivial
+def inter_subspaces {R α : Type*} [Semiring R] [AddCommGroup α] [Module R α] {U₁ U₂ : Submodule R α}
+        : Submodule R α := U₁ ⊓ U₂
+
+-- exercise 11: Prove that the intersection of every collection of submodules of V is a submodule of V.
+-- Same as exercise 10, it will be easy to be proved using mathlib.
+def sInter_subspaces {R α : Type*} [Semiring R] [AddCommGroup α] [Module R α] (S : Set (Submodule R α))
+        : Submodule R α :=  sInf S
+
+-- exercise 12: skip
+
+-- exercise 13: skip
+-- exercise 14: skip
