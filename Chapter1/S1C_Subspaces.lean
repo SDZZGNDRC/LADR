@@ -17,8 +17,8 @@ import Mathlib.Data.Fin.VecNotation
 def subspace_ex1_33 : Submodule ℝ (Fin 3 → ℝ) where
   carrier := { ![x₁, x₂, (0 : ℝ)] | (x₁ : ℝ) (x₂ : ℝ)}
   zero_mem' := by simp
-  add_mem' := by aesop?
-  smul_mem' := by aesop?
+  add_mem' := by aesop
+  smul_mem' := by aesop
 
 -- 1.34 Conditions for a subspace
 -- The three conditions are corresponding to `zero_mem`, `add_mem` and `smul_mem` in `Submodule`
@@ -122,12 +122,47 @@ def ex1_41_U: Submodule F (Fin 3 → F) where
   zero_mem' := by simp
 
 def ex1_41_V: Submodule F (Fin 3 → F) where
-  carrier := { ![0, 0, z] | (z: F)}
+  carrier := { ![0, 0, z] | (z: F) }
   add_mem' := by aesop
   smul_mem' := by aesop
   zero_mem' := by simp
 
-example : IsCompl ex1_41_U ex1_41_V := by sorry
+example : IsCompl (ex1_41_U F) (ex1_41_V F) := by
+  rw [isCompl_iff]
+  constructor
+  · rw [disjoint_iff, Submodule.eq_bot_iff (ex1_41_U F ⊓ ex1_41_V F)]
+    intro X hX
+    rw [Submodule.mem_inf] at hX
+    have h₁ : X ∈ { ![x, y, 0] | (x: F) (y: F) } := by aesop
+    have h₂ : X ∈ {![0, 0, z] | (z: F) } := by aesop
+    simp at h₁ h₂
+    rcases h₁ with ⟨x, y, h'⟩
+    rcases h₂ with ⟨z, h''⟩
+    ext i
+    fin_cases i <;> simp
+    · aesop
+    · rw [←h'']; simp
+    · rw [←h']; simp
+  · rw [codisjoint_iff, Submodule.eq_top_iff']
+    intro X
+    rw [Submodule.mem_sup]
+    let y := ![X 0, X 1, 0]
+    let z := ![0, 0, X 2]
+    use y
+    constructor
+    · apply (Submodule.mem_carrier (ex1_41_U F)).mp
+      dsimp [ex1_41_U]; aesop
+    · use z
+      constructor
+      · apply (Submodule.mem_carrier (ex1_41_V F)).mp
+        dsimp [ex1_41_V]; aesop
+      · ext i
+        fin_cases i <;> simp
+        · dsimp [y, z]; aesop
+        · dsimp [y, z]; aesop
+        · dsimp [y, z]; aesop
+
+
 
 
 -- 1.42 TODO: example
