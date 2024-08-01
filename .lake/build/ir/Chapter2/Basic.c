@@ -1,5 +1,5 @@
 // Lean compiler output
-// Module: Chapter1.Basic
+// Module: Chapter2.Basic
 // Imports: Init Mathlib.Tactic Mathlib.Algebra.Group.Basic Mathlib.Algebra.Group.Defs
 #include <lean/lean.h>
 #if defined(__clang__)
@@ -18,7 +18,7 @@ lean_object* initialize_Mathlib_Tactic(uint8_t builtin, lean_object*);
 lean_object* initialize_Mathlib_Algebra_Group_Basic(uint8_t builtin, lean_object*);
 lean_object* initialize_Mathlib_Algebra_Group_Defs(uint8_t builtin, lean_object*);
 static bool _G_initialized = false;
-LEAN_EXPORT lean_object* initialize_Chapter1_Basic(uint8_t builtin, lean_object* w) {
+LEAN_EXPORT lean_object* initialize_Chapter2_Basic(uint8_t builtin, lean_object* w) {
 lean_object * res;
 if (_G_initialized) return lean_io_result_mk_ok(lean_box(0));
 _G_initialized = true;
