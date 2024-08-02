@@ -29,14 +29,12 @@ example : ![17, -4, 2] = (6 : ℝ) • ![(2 : ℝ), 1, -3] + (5 : ℝ) • ![(1 
   · simp; linarith
   · simp; linarith
 
+
 example : ¬∃ (a₁ : ℝ) (a₂ : ℝ), ![(17 : ℝ), -4, 5] = a₁ • ![2, 1, -3] + a₂ • ![1, -2, 4] := by
   intro ⟨a₁, a₂, h⟩
-  have h₁ : 17 = a₁ * 2 + a₂ * 1 := by
-
-  have h₂ : -4 = a₁ * 1 + a₂ * (-2) := by
-    simp [h]
-  have h₃ : 5 = a₁ * (-3) + a₂ * 4 := by
-    simp [h]
+  have h₁ : 17 = a₁ * 2 + a₂ * 1 := congrFun h 0
+  have h₂ : -4 = a₁ * 1 + a₂ * -2 := congrFun h 1
+  have h₃ : 5 = a₁ * -3 + a₂ * 4 := congrFun h 2
   linarith
 
 
@@ -51,9 +49,27 @@ example : ¬∃ (a₁ : ℝ) (a₂ : ℝ), ![(17 : ℝ), -4, 5] = a₁ • ![2, 
 
 -- 2.6 example
 example : ![17, -4, 2] ∈ Submodule.span ℝ {![(2 : ℝ), 1, -3], ![1, -2, 4]} := by
-  rw [Submodule.mem_span]
-  intro p h
-  sorry
+  rw [mem_span_set]
+  let c : (Fin 3 → ℝ) →₀ ℝ := {
+    support := {![2, 1, -3], ![1, -2, 4]}
+    toFun := fun v => if v = ![2, 1, -3] then 6 else if v = ![1, -2, 4] then 5 else 0
+    mem_support_toFun := by
+      intro a
+      constructor <;> intro h
+      · intro h'
+        aesop
+      · simp
+        aesop
+  }
+  use c
+  simp at *
+  constructor
+  · rfl
+  · ext x
+    fin_cases x
+    · sorry
+    · sorry
+    · sorry
 
 example : ![17, -4, 5] ∉ Submodule.span ℝ {![(2 : ℝ), 1, -3], ![1, -2, 4]} :=
   sorry
@@ -67,9 +83,8 @@ example : ![17, -4, 5] ∉ Submodule.span ℝ {![(2 : ℝ), 1, -3], ![1, -2, 4]}
 -- 2.8 Definitions: Spans
 -- In mathlib, we can express `span(v₁,...,vₙ) equals V` as follows (because `Submodule.top_coe`):
 example : Submodule.span ℝ {![(1 : ℝ), 0], ![0, 1]} = ⊤ := by
-  rw [Submodule.eq_top_iff']
-  intro x s ⟨y, hsy⟩
-  simp at *
+  ext x
+  rw [mem_span_set]
   sorry
 
 -- 2.9 example
@@ -97,12 +112,10 @@ example {n : ℕ} : FiniteDimensional F (Fin n → F) := by
   apply FiniteDimensional.of_fintype_basis (Pi.basisFun F (Fin n))
 
 example {n : ℕ} : FiniteDimensional.finrank F (Fin n → F) = n := by
-  sorry
+  aesop
 
 -- 2.11 Definition: polynomial
 -- `Polynomial` in Mathlib
-
--- TODO: The set of all polynomials with coefficients in `F`.
 
 -- 2.12 Definition: Degree of a polynomial
 -- `Polynomial.degree` in Mathlib

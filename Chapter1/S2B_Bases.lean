@@ -34,6 +34,36 @@ FIXME: Maybe need to use other terms in mathlib to express this.
 Because `Basis.repr` is a function, that means a vector `v` is uniquely written as a linear combination of basis vectors.
 A function can not map a value to multiple values.
 
+`congrArg` in mathlib.
+
 -/
 
+#check congrArg
+
 #check Basis.repr_injective -- FIXME: ?
+
+
+-- TODO) 2.31 Spanning list contains a basis
+
+
+-- 2.32 Basis of finite-dimensional vector space
+
+/-
+Every finite-dimensional vector space has a basis.
+
+`Basis.exists_basis` in mathlib states the existence of a nonempty-basis.
+-/
+
+-- TODO) 2.33 Linearly independent list extends to a basis
+
+/-
+Every linearly independent list of vectors in a finite-dimensional vector
+space can be extended to a basis of the vector space.
+-/
+
+-- TODO) 2.34 Every subspace of V is part of a direct sum equal to V
+
+/-
+Suppose V is finite-dimensional and U is a subspace of V. Then there is a
+subspace W of V such that V ⨁ U = W.
+-/
