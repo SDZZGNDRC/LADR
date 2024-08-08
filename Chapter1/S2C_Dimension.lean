@@ -63,19 +63,45 @@ vectors in V with length dim V is a basis of V.
 #check linearIndependent_le_basis
 
 
--- TODO) 2.40 example: Show that the list (5,7),(4,3) is a basis of F².
-noncomputable def ex_2_40 : Basis (Fin 2) F (Fin 2 → F) := Basis.ofEquivFun {
+-- 2.40 example: Show that the list (5,7),(4,3) is a basis of F². (F is ℝ or ℂ)
+noncomputable def ex_2_40 : Basis (Fin 2) ℝ (Fin 2 → ℝ) := Basis.ofEquivFun {
     toFun := fun v => fun x => match x with
-      | 0 => 7 / 13 * (v 0) - 5 / 13 * (v 1)
-      | 1 => -(3 / 13) * (v 0) + 4 / 13 * (v 1)
-    map_add' := by sorry
-    map_smul' := sorry
-    invFun := sorry
-    left_inv := sorry
-    right_inv := sorry
+      | 0 => -(3 / 13) * (v 0) + 4 / 13 * (v 1)
+      | 1 => 7 / 13 * (v 0) - 5 / 13 * (v 1)
+    map_add' := by
+      intro x y
+      -- simp_all
+      funext v
+      fin_cases v <;> simp_all
+      · ring
+      · ring
+    map_smul' := by
+      intro r v
+      simp_all
+      funext x
+      fin_cases x <;> simp_all
+      · ring
+      · ring
+    invFun := fun v => fun x => match x with
+      | 0 => 5 * (v 0) + 4 * (v 1)
+      | 1 => 7 * (v 0) + 3 * (v 1)
+    left_inv := by
+      unfold Function.LeftInverse
+      intro x
+      funext i
+      fin_cases i <;> simp_all
+      · ring
+      · ring
+    right_inv := by
+      unfold Function.RightInverse
+      intro x
+      funext i
+      fin_cases i <;> simp_all
+      · ring
+      · ring
   }
 
--- FIXME: Can we remove [LinearOrder F]
+-- FIXME: Can we remove [LinearOrder F] ?
 -- Show that list (1,1), (1,-1) is a basis of F².
 noncomputable example : Basis (Fin 2) ℝ (Fin 2 → ℝ) := Basis.ofEquivFun {
   toFun := fun v => fun x => match x with
@@ -119,15 +145,6 @@ noncomputable example : Basis (Fin 2) ℝ (Fin 2 → ℝ) := Basis.ofEquivFun {
     · simp_all
     · simp_all
 }
-
--- may help:
-#check Basis.ofEquivFun
-#check Basis.finTwoProd
-#check LinearEquiv.finTwoArrow
-#check LinearEquiv
-#check LinearMap
-#check AddEquiv
-  #check Equiv
 
 -- TODO) 2.41 example
 

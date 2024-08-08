@@ -48,6 +48,7 @@ example : ¬∃ (a₁ : ℝ) (a₂ : ℝ), ![(17 : ℝ), -4, 5] = a₁ • ![2, 
 -- Beside, mathlib introduce the notation `R • v` for the span of a singleton, `Submodule.span R {v}`.
 
 -- 2.6 example
+-- FIXME: There must be a more concise solution. The following is too foolish.
 example : ![17, -4, 2] ∈ Submodule.span ℝ {![(2 : ℝ), 1, -3], ![1, -2, 4]} := by
   rw [mem_span_set]
   let c : (Fin 3 → ℝ) →₀ ℝ := {
@@ -56,22 +57,72 @@ example : ![17, -4, 2] ∈ Submodule.span ℝ {![(2 : ℝ), 1, -3], ![1, -2, 4]}
     mem_support_toFun := by
       intro a
       constructor <;> intro h
-      · intro h'
-        aesop
-      · simp
-        aesop
+      · intro h'; aesop
+      · simp; aesop
   }
-  use c
-  simp at *
-  constructor
+  use c; simp at *; constructor
   · rfl
   · ext x
     fin_cases x
-    · sorry
-    · sorry
-    · sorry
+    · unfold Finsupp.sum
+      simp_all
+      have : {![2, 1, -3], ![1, -2, 4]} = ({![2, 1, -3]} : Finset (Fin 3 → ℝ)) ∪ {![1, -2, 4]} := by aesop
+      have h' : ![(1 : ℝ), -2, 4] ≠ ![2, 1, -3] := by
+        intro h
+        have : (1 : ℝ) = 2 := by
+          calc
+            1 = ![(1 : ℝ), -2, 4] 0 := by rfl
+            _ = ![(2 : ℝ), 1, -3] 0 := by rw [h]
+            _ = 2 := by rfl
+        linarith
+      rw [this, Finset.sum_union]
+      dsimp [c]
+      simp_all
+      norm_num
+      rw [Finset.disjoint_singleton]
+      aesop
+    · unfold Finsupp.sum
+      simp_all
+      have : {![2, 1, -3], ![1, -2, 4]} = ({![2, 1, -3]} : Finset (Fin 3 → ℝ)) ∪ {![1, -2, 4]} := by aesop
+      have h' : ![(1 : ℝ), -2, 4] ≠ ![2, 1, -3] := by
+        intro h
+        have : (1 : ℝ) = 2 := by
+          calc
+            1 = ![(1 : ℝ), -2, 4] 0 := by rfl
+            _ = ![(2 : ℝ), 1, -3] 0 := by rw [h]
+            _ = 2 := by rfl
+        linarith
+      rw [this, Finset.sum_union]
+      dsimp [c]
+      simp_all
+      norm_num
+      rw [Finset.disjoint_singleton]
+      aesop
+    · unfold Finsupp.sum
+      simp_all
+      have : {![2, 1, -3], ![1, -2, 4]} = ({![2, 1, -3]} : Finset (Fin 3 → ℝ)) ∪ {![1, -2, 4]} := by aesop
+      have h' : ![(1 : ℝ), -2, 4] ≠ ![2, 1, -3] := by
+        intro h
+        have : (1 : ℝ) = 2 := by
+          calc
+            1 = ![(1 : ℝ), -2, 4] 0 := by rfl
+            _ = ![(2 : ℝ), 1, -3] 0 := by rw [h]
+            _ = 2 := by rfl
+        linarith
+      rw [this, Finset.sum_union]
+      dsimp [c]
+      simp_all
+      norm_num
+      rw [Finset.disjoint_singleton]
+      aesop
 
-example : ![17, -4, 5] ∉ Submodule.span ℝ {![(2 : ℝ), 1, -3], ![1, -2, 4]} :=
+
+example : ![17, -4, 5] ∉ Submodule.span ℝ {![(2 : ℝ), 1, -3], ![1, -2, 4]} := by
+  intro h
+  rw [mem_span_set] at h
+  rcases h with ⟨c ,hc, h⟩
+  simp at c
+  unfold Finsupp.sum at h
   sorry
 
 -- 2.7 Span is the smallest containing subspace
@@ -80,12 +131,49 @@ example : ![17, -4, 5] ∉ Submodule.span ℝ {![(2 : ℝ), 1, -3], ![1, -2, 4]}
 #check Submodule.span_le
 
 
+
+
+#check Pi.basisFun ℝ (Fin 2)
+
+example : DFunLike.coe (Pi.basisFun ℝ (Fin 2)) = ![![1, 0], ![0, 1]] := by
+  ext i j
+  sorry
+
+
+
 -- 2.8 Definitions: Spans
 -- In mathlib, we can express `span(v₁,...,vₙ) equals V` as follows (because `Submodule.top_coe`):
 example : Submodule.span ℝ {![(1 : ℝ), 0], ![0, 1]} = ⊤ := by
-  ext x
+  rw [Submodule.eq_top_iff']
+  intro x
+  simp at x
+  by_cases h : x = 0
+  · sorry
+  -- x ≠ 0 now
   rw [mem_span_set]
-  sorry
+  let c : (Fin 2 → ℝ) →₀ ℝ := {
+    support := {![(1 : ℝ), 0], ![0, (1 : ℝ)]}
+    toFun := fun v => if v = ![(1 : ℝ), 0] then x 0 else if v = ![0, (1 : ℝ)] then x 1 else 0
+    mem_support_toFun := by
+      intro a
+      sorry
+  }
+  use c
+  simp_all
+  constructor
+  · apply subset_rfl
+  · unfold Finsupp.sum
+    simp_all
+    have : {![1, 0], ![0, 1]} = ({![1, 0]} : Finset (Fin 2 → ℝ)) ∪ {![0, 1]} := by aesop
+    rw [this, Finset.sum_union]
+    dsimp [c]
+    have : ![(0 : ℝ), 1] ≠ ![(1 : ℝ), 0] := by sorry
+    funext i
+    fin_cases i <;> simp_all
+    rw [Finset.disjoint_singleton]
+    intro h
+    have h₁ : 1 = 0 := congrFun h 0
+    linarith
 
 -- 2.9 example
 -- In mathlib, the canonical basis is packed up as `Pi.basisFun`

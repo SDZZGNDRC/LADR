@@ -40,7 +40,7 @@ example {U V : Submodule F M} : (U + V).carrier = { x | ∃ a ∈ U, ∃ b ∈ V
   simp
   ext x; simp [Set.mem_add]
   constructor <;> intro h
-  · sorry
+  · apply Submodule.mem_sup.mp h
   · aesop
 
 end
@@ -104,7 +104,7 @@ example {U V : Submodule F M} : ∀ W, U ≤ W ∧ V ≤ W → U + V ≤ W := by
 end
 
 -- 1.40 Definition: direct sum
--- NOTICE: `∃! u ∈ U, ∃! v ∈ V, u + v = 0` is not equivalent to `∃! uv : M × M, uv.1 ∈ U ∧ uv.2 ∈ V → uv.1 + uv.2 = 0`
+-- NOTICE: (Maybe?) `∃! u ∈ U, ∃! v ∈ V, u + v = 0` is not equivalent to `∃! uv : M × M, uv.1 ∈ U ∧ uv.2 ∈ V → uv.1 + uv.2 = 0`
 section
 variable (F M : Type*)
 variable [Ring F] [AddCommGroup M] [Module F M]
@@ -140,7 +140,7 @@ example : IsCompl (ex1_41_U F) (ex1_41_V F) := by
     rcases h₂ with ⟨z, h''⟩
     ext i
     fin_cases i <;> simp
-    · aesop
+    · rw [←h'']; simp
     · rw [←h'']; simp
     · rw [←h']; simp
   · rw [codisjoint_iff, Submodule.eq_top_iff']
